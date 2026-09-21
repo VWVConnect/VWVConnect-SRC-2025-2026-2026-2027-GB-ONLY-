@@ -5,10 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const resultOutput = document.getElementById('result');
   const calculateBtn = document.getElementById('calculateBtn');
   const resetBtn = document.getElementById('resetBtn');
-  const regionSwitch = document.getElementById('regionSwitch');
   const rateButtons = document.querySelectorAll('.rate-btn');
 
-  let selectedRateYear = "2025"; // default
+  let selectedRateYear = "2025";
 
   // Rate toggle selection
   rateButtons.forEach(btn => {
@@ -19,37 +18,36 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  function getSelectedRegionCode() {
-    return regionSwitch.checked ? 'NI' : 'GB';
-  }
-
   calculateBtn.addEventListener('click', function () {
     const age = parseInt(ageInput.value);
     const years = parseInt(yearsInput.value);
     let pay = parseFloat(payInput.value);
-    const regionCode = getSelectedRegionCode();
     const rateYear = selectedRateYear;
 
     // Weekly pay caps for statutory redundancy
     const caps = {
-      GB: { "2025": 719, "2026": 751 },
+      "2025": 719,
+      "2026": 751
     };
 
-    const maxWeeklyPay = caps[regionCode][rateYear];
+    const maxWeeklyPay = caps[rateYear];
     const maxYears = 20;
 
     if (isNaN(age) || isNaN(years) || isNaN(pay)) {
       resultOutput.textContent = 'Please fill in all fields correctly.';
       return;
     }
+
     if (age < 16 || age > 100) {
       resultOutput.textContent = 'Age must be between 16 and 100.';
       return;
     }
+
     if (years < 0 || years > 50) {
       resultOutput.textContent = 'Years of service must be between 0 and 50.';
       return;
     }
+
     if (pay < 0) {
       resultOutput.textContent = 'Weekly pay must be a positive number.';
       return;
@@ -60,11 +58,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Calculate total weeks
     const effectiveYears = Math.min(years, maxYears);
     let totalWeeks = 0;
+
     for (let i = 0; i < effectiveYears; i++) {
       const yearAge = age - i - 1;
-      if (yearAge < 22) totalWeeks += 0.5;
-      else if (yearAge < 41) totalWeeks += 1;
-      else totalWeeks += 1.5;
+
+      if (yearAge < 22) {
+        totalWeeks += 0.5;
+      } else if (yearAge < 41) {
+        totalWeeks += 1;
+      } else {
+        totalWeeks += 1.5;
+      }
     }
 
     const redundancyPay = (totalWeeks * pay).toFixed(2);
@@ -78,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
       : "";
 
     resultOutput.innerHTML =
-      `Statutory Redundancy Pay (${regionCode} ${displayYear}): £${redundancyPay} (${totalWeeks} weeks)` +
+      `Statutory Redundancy Pay (GB ${displayYear}): £${redundancyPay} (${totalWeeks} weeks)` +
       (disclaimer ? `<br><em>${disclaimer}</em>` : "");
   });
 
@@ -87,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
     yearsInput.value = '';
     payInput.value = '';
     resultOutput.textContent = '';
-    regionSwitch.checked = false;
 
     rateButtons.forEach(b => b.classList.remove('active'));
     rateButtons[0].classList.add('active');
