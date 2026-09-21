@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let selectedRateYear = "2025";
 
-  // Rate toggle selection
+  // Rate year selection
   rateButtons.forEach(btn => {
     btn.addEventListener('click', function () {
       rateButtons.forEach(b => b.classList.remove('active'));
@@ -18,13 +18,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // Calculate statutory redundancy pay
   calculateBtn.addEventListener('click', function () {
     const age = parseInt(ageInput.value);
     const years = parseInt(yearsInput.value);
     let pay = parseFloat(payInput.value);
     const rateYear = selectedRateYear;
 
-    // Weekly pay caps for statutory redundancy
+    // Weekly pay caps for Great Britain
     const caps = {
       "2025": 719,
       "2026": 751
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const maxWeeklyPay = caps[rateYear];
     const maxYears = 20;
 
+    // Validate inputs
     if (isNaN(age) || isNaN(years) || isNaN(pay)) {
       resultOutput.textContent = 'Please fill in all fields correctly.';
       return;
@@ -53,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
+    // Apply statutory weekly pay cap
     pay = Math.min(pay, maxWeeklyPay);
 
     // Calculate total weeks
@@ -71,21 +74,24 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
+    // Calculate redundancy payment
     const redundancyPay = (totalWeeks * pay).toFixed(2);
 
     // Format display year
     const displayYear = rateYear === "2025" ? "25-26" : "26-27";
 
-    // Disclaimer only for 2025–2026
+    // Disclaimer for 2025-2026
     const disclaimer = rateYear === "2025"
       ? "The stated rate will remain in effect until 05 April 2026."
       : "";
 
+    // Display result
     resultOutput.innerHTML =
       `Statutory Redundancy Pay (GB ${displayYear}): £${redundancyPay} (${totalWeeks} weeks)` +
       (disclaimer ? `<br><em>${disclaimer}</em>` : "");
   });
 
+  // Reset calculator
   resetBtn.addEventListener('click', function () {
     ageInput.value = '';
     yearsInput.value = '';
@@ -94,6 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     rateButtons.forEach(b => b.classList.remove('active'));
     rateButtons[0].classList.add('active');
+
     selectedRateYear = "2025";
   });
 });
